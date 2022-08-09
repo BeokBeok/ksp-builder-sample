@@ -6,6 +6,10 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 
 class AutoBuilderProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
-        TODO("Not yet implemented")
+        return AutoBuilderSymbolProcessor(
+            codeGenerator = environment.codeGenerator,
+            logger = environment.logger,
+            options = environment.options,
+        )
     }
 }
