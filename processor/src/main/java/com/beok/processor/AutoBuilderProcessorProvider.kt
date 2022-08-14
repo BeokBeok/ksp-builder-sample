@@ -9,7 +9,6 @@ class AutoBuilderProcessorProvider : SymbolProcessorProvider {
         return AutoBuilderSymbolProcessor(
             codeGenerator = environment.codeGenerator,
             logger = environment.logger,
-            options = environment.options,
         )
     }
 }
