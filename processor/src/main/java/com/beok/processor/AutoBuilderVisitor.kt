@@ -103,13 +103,20 @@ class AutoBuilderVisitor(
      */
     private fun toCreatePrivateVariable(property: KSPropertyDeclaration) {
         val name: String = property.simpleName.asString()
+        var hasAnnotation = false
         property.annotations.forEach { annotation ->
-            if (annotation.shortName.asString() != BuilderProperty::class.java.simpleName) {
-                file.write("\t\t$name = $name,\n".toByteArray())
-            } else {
-                file.write("\t\t$name = null,\n".toByteArray())
+            if (annotation.shortName.asString() == BuilderProperty::class.java.simpleName) {
+                hasAnnotation = true
+                return@forEach
             }
         }
+        file.write(
+            if (hasAnnotation) {
+                "\t\t$name = null,\n".toByteArray()
+            } else {
+                "\t\t$name = $name,\n".toByteArray()
+            }
+        )
     }
 
     /*
@@ -117,20 +124,24 @@ class AutoBuilderVisitor(
      */
     private fun toCreateConstructor(property: KSPropertyDeclaration) {
         val typeResolve = property.type.resolve()
+        var hasAnnotation = false
         property.annotations.forEach { annotation ->
-            if (annotation.shortName.asString() != BuilderProperty::class.java.simpleName) {
-                val name: String = property.simpleName.asString()
-                val type: String = typeResolve.declaration.qualifiedName?.asString() ?: ""
-                val nullable = if (typeResolve.nullability == Nullability.NULLABLE) "?" else ""
-                val genericArguments: List<KSTypeArgument> =
-                    property.type.element?.typeArguments ?: emptyList()
-                val generic = visitTypeArguments(genericArguments, logger::error)
-                file.write("\t$name: $type$generic$nullable,\n".toByteArray())
+            if (annotation.shortName.asString() == BuilderProperty::class.java.simpleName) {
+                hasAnnotation = true
                 return@forEach
             }
-            if (typeResolve.nullability != Nullability.NULLABLE) {
-                logger.error("BuilderProperties have to be nullable", property)
-            }
         }
+        if (hasAnnotation) {
+            if ((typeResolve.nullability == Nullability.NULLABLE)) return
+            logger.error("BuilderProperties have to be nullable", property)
+            return
+        }
+        val name: String = property.simpleName.asString()
+        val type: String = typeResolve.declaration.qualifiedName?.asString() ?: ""
+        val nullable = if (typeResolve.nullability == Nullability.NULLABLE) "?" else ""
+        val genericArguments: List<KSTypeArgument> =
+            property.type.element?.typeArguments ?: emptyList()
+        val generic = visitTypeArguments(genericArguments, logger::error)
+        file.write("\t$name: $type$generic$nullable,\n".toByteArray())
     }
 }
