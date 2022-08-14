@@ -87,7 +87,7 @@ class AutoBuilderVisitor(
             val generic = visitTypeArguments(genericArguments, logger::error)
 
             file.write("\tfun $name($name: $type$generic): $fileName {\n".toByteArray())
-            file.write("\t\t$objectName$name = $name\n".toByteArray())
+            file.write("\t\t$objectName.$name = $name\n".toByteArray())
             file.write("\t\treturn this\n".toByteArray())
             file.write("\t}\n\n".toByteArray())
         }
