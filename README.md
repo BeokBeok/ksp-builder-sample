@@ -53,4 +53,4 @@ class PersonBuilder(
 
 </details>
 
-ref. https://github.com/Darvishiyan/KSP-Builder-Sample
+ref. https://betterprogramming.pub/how-to-use-ksp-on-android-f7df3a87d05e
